@@ -1,6 +1,27 @@
 version: '3.8'
 
 services:
+  # Project initialization service
+  init:
+    image: node:18-alpine
+    volumes:
+      - .:/app
+    working_dir: /app
+    command: >
+      sh -c "
+      if [ ! -f package.json ]; then
+        npm init -y &&
+        npm install express cors helmet uuid &&
+        npm install --save-dev nodemon jest supertest &&
+        mkdir -p src tests &&
+        echo 'Project initialized! Now run: docker-compose up banking-api';
+      else
+        echo 'Project already initialized!';
+      fi
+      "
+    profiles:
+      - init
+
   banking-api:
     build: 
       context: .
