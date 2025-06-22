@@ -11,13 +11,28 @@
   "customizations": {
     "vscode": {
       "extensions": [
+        // Core development extensions
         "ms-vscode.vscode-json",
-        "bradlc.vscode-tailwindcss",
-        "ms-vscode.vscode-typescript-next",
+        "ms-vscode.vscode-typescript-next", 
         "esbenp.prettier-vscode",
         "ms-vscode.vscode-eslint",
+        
+        // Testing and API
+        "ms-vscode.vscode-jest",
         "humao.rest-client",
-        "ms-vscode.vscode-jest"
+        
+        // Node.js development
+        "ms-vscode.vscode-node-debug2",
+        "christian-kohler.npm-intellisense",
+        
+        // Docker support
+        "ms-azuretools.vscode-docker",
+        
+        // Git integration
+        "eamodio.gitlens",
+        
+        // Code quality
+        "streetsidesoftware.code-spell-checker"
       ],
       "settings": {
         "editor.formatOnSave": true,

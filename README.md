@@ -136,21 +136,24 @@ docker-compose exec banking-api sh
 - ✅ No additional VS Code dependencies
 - ✅ Fast setup
 
-### Option 2: VS Code Dev Container (Optional)
+### Option 2: Dev Container (VS Code/Cursor)
 
-For VS Code users who want deeper IDE integration:
+For VS Code or Cursor users who want deeper IDE integration:
 
 1. **Prerequisites:**
-   - VS Code with Dev Containers extension
+   - VS Code with Dev Containers extension, OR
+   - Cursor (has built-in Dev Container support)
    - Docker and Docker Compose
 
 2. **Setup:**
    ```bash
-   # Open project in VS Code
+   # For VS Code
    code .
-   
    # Press F1 → "Dev Containers: Reopen in Container"
-   # VS Code will build and connect to the development container
+   
+   # For Cursor  
+   cursor .
+   # Press Cmd/Ctrl+Shift+P → "Dev Containers: Reopen in Container"
    ```
 
 **Advantages:**
