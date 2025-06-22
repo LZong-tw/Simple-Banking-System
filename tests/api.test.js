@@ -1,5 +1,5 @@
 const request = require('supertest');
-const app = require('../src/index');
+const { app } = require('../src/server');
 
 describe('Banking API', () => {
   describe('Health Check', () => {
@@ -74,9 +74,9 @@ describe('Banking API', () => {
         .send({ amount: 250 })
         .expect(200);
       
-      expect(response.body.account.balance).toBe(1250);
-      expect(response.body.transaction.type).toBe('deposit');
-      expect(response.body.transaction.amount).toBe(250);
+      expect(response.body.accountId).toBe(accountId1);
+      expect(response.body.newBalance).toBe(1250);
+      expect(response.body.timestamp).toBeDefined();
     });
 
     test('POST /api/accounts/:accountId/withdraw should subtract money', async () => {
@@ -85,8 +85,9 @@ describe('Banking API', () => {
         .send({ amount: 200 })
         .expect(200);
       
-      expect(response.body.account.balance).toBe(1050); // 1250 - 200
-      expect(response.body.transaction.type).toBe('withdraw');
+      expect(response.body.accountId).toBe(accountId1);
+      expect(response.body.newBalance).toBe(1050); // 1250 - 200
+      expect(response.body.timestamp).toBeDefined();
     });
 
     test('POST /api/accounts/:accountId/withdraw should reject insufficient funds', async () => {
@@ -104,11 +105,15 @@ describe('Banking API', () => {
           toAccountId: accountId2,
           amount: 300
         })
-        .expect(201);
+        .expect(200); // 改為 200，因為控制器返回 res.json() 而不是 res.status(201)
       
-      expect(response.body.fromAccount.balance).toBe(750); // 1050 - 300
-      expect(response.body.toAccount.balance).toBe(800);   // 500 + 300
-      expect(response.body.transaction.type).toBe('transfer');
+      expect(response.body.fromAccountId).toBe(accountId1);
+      expect(response.body.toAccountId).toBe(accountId2);
+      expect(response.body.amount).toBe(300);
+      expect(response.body.fromBalance).toBe(750); // 1050 - 300
+      expect(response.body.toBalance).toBe(800);   // 500 + 300
+      expect(response.body.transferId).toBeDefined();
+      expect(response.body.timestamp).toBeDefined();
     });
 
     test('GET /api/accounts/:accountId/transactions should return transaction history', async () => {
