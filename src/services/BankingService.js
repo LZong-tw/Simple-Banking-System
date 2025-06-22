@@ -1,18 +1,22 @@
 const Account = require('../models/Account');
+const logger = require('../utils/logger');
 const { v4: uuidv4 } = require('uuid');
 
 class BankingService {
   constructor() {
     this.accounts = new Map();
     this.transactionLocks = new Set();
+    logger.info('Banking service initialized');
   }
 
   createAccount(name, initialBalance = 0) {
     if (!name || typeof name !== 'string' || name.trim().length === 0) {
+      logger.warn('Account creation failed: Invalid name', { name, initialBalance });
       throw new Error('Account name is required');
     }
 
     if (initialBalance < 0) {
+      logger.warn('Account creation failed: Negative balance', { name, initialBalance });
       throw new Error('Initial balance cannot be negative');
     }
 
@@ -20,12 +24,14 @@ class BankingService {
     const account = new Account(id, name.trim(), initialBalance);
     this.accounts.set(id, account);
     
+    logger.logAccountCreation(id, account.name, initialBalance);
     return account;
   }
 
   getAccount(accountId) {
     const account = this.accounts.get(accountId);
     if (!account) {
+      logger.warn('Account not found', { accountId });
       throw new Error('Account not found');
     }
     return account;
@@ -34,12 +40,14 @@ class BankingService {
   deposit(accountId, amount) {
     const account = this.getAccount(accountId);
     const newBalance = account.deposit(amount);
+    logger.logTransaction('DEPOSIT', accountId, amount, newBalance);
     return { accountId, newBalance, timestamp: new Date() };
   }
 
   withdraw(accountId, amount) {
     const account = this.getAccount(accountId);
     const newBalance = account.withdraw(amount);
+    logger.logTransaction('WITHDRAW', accountId, amount, newBalance);
     return { accountId, newBalance, timestamp: new Date() };
   }
 
@@ -92,6 +100,14 @@ class BankingService {
         `Transfer from ${fromAccount.name} (${fromAccount.id})`
       );
 
+      logger.logTransfer(fromAccountId, toAccountId, amount, {
+        transferId,
+        fromBalance: fromAccount.balance,
+        toBalance: toAccount.balance,
+        fromAccountName: fromAccount.name,
+        toAccountName: toAccount.name
+      });
+
       return {
         transferId,
         fromAccountId,
@@ -102,6 +118,14 @@ class BankingService {
         toBalance: toAccount.balance
       };
 
+    } catch (error) {
+      logger.error('Transfer failed', {
+        error: error.message,
+        fromAccountId,
+        toAccountId,
+        amount
+      });
+      throw error;
     } finally {
       this.transactionLocks.delete(transactionKey);
     }

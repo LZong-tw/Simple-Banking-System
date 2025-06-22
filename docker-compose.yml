@@ -38,6 +38,8 @@ services:
       - ./tests:/app/tests
       # Prevent node_modules from being overwritten
       - /app/node_modules
+      # Persistent log storage
+      - ./logs:/app/logs
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
       interval: 30s
@@ -58,6 +60,9 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3000
+    volumes:
+      # Persistent log storage for production
+      - ./logs:/app/logs
     healthcheck:
       test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"]
       interval: 30s

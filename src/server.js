@@ -3,9 +3,22 @@ const cors = require('cors');
 const helmet = require('helmet');
 const BankingService = require('./services/BankingService');
 const createBankingRoutes = require('./routes/bankingRoutes');
+const logger = require('./utils/logger');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// Request logging middleware
+app.use((req, res, next) => {
+    const start = Date.now();
+    
+    res.on('finish', () => {
+        const responseTime = Date.now() - start;
+        logger.logApiRequest(req, res, responseTime);
+    });
+    
+    next();
+});
 
 // Middleware
 app.use(helmet());
@@ -25,7 +38,11 @@ app.get('/health', (req, res) => {
 
 // Error handling middleware
 app.use((err, req, res, next) => {
-  console.error(err.stack);
+  logger.logError(err, {
+    url: req.url,
+    method: req.method,
+    ip: req.ip
+  });
   res.status(500).json({ error: 'Something went wrong!' });
 });
 
@@ -35,7 +52,11 @@ app.use((req, res) => {
 });
 
 const server = app.listen(PORT, () => {
-  console.log(`Banking system server running on port ${PORT}`);
+  logger.info(`Banking system server started`, {
+    port: PORT,
+    nodeEnv: process.env.NODE_ENV || 'development',
+    timestamp: new Date().toISOString()
+  });
 });
 
 module.exports = { app, server, bankingService };

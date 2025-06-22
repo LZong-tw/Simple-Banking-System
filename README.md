@@ -196,3 +196,64 @@ tests/
 - `./src:/app/src`: Live code reloading in development
 - `./tests:/app/tests`: Test files mounting
 - `/app/node_modules`: Dependency isolation
+
+## Logging
+
+The banking system includes comprehensive logging for debugging, monitoring, and audit purposes.
+
+### Log Files
+
+```bash
+# View logs from host machine
+ls ./logs/
+
+# Common log files:
+./logs/app.log          # All application logs
+./logs/error.log        # Error logs only
+./logs/transactions.log # Banking transaction logs
+```
+
+### Log Viewing Commands
+
+```bash
+# View recent application logs
+./scripts/view-logs.sh app 100
+
+# View error logs
+./scripts/view-logs.sh error
+
+# View transaction logs
+./scripts/view-logs.sh transaction 50
+
+# Live log monitoring
+./scripts/view-logs.sh live
+
+# Log statistics
+./scripts/view-logs.sh stats
+
+# From within Docker container
+docker-compose exec banking-api cat /app/logs/app.log
+docker-compose exec banking-api tail -f /app/logs/app.log
+```
+
+### Log Format
+
+All logs are in JSON format for easy parsing:
+
+```json
+{
+  "timestamp": "2025-06-22T10:30:00.000Z",
+  "level": "INFO",
+  "message": "Account created",
+  "action": "CREATE_ACCOUNT",
+  "accountId": "abc-123",
+  "accountName": "John Doe",
+  "initialBalance": 1000
+}
+```
+
+### Log Retention
+
+- Logs are persistent across container restarts
+- Logs are excluded from git (privacy protection)
+- Consider log rotation for production use
