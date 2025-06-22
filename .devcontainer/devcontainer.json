@@ -1,0 +1,50 @@
+{
+  "name": "Banking System Development",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "banking-api",
+  "workspaceFolder": "/app",
+  
+  // Post-create commands
+  "postCreateCommand": "npm install",
+  
+  // VS Code customizations
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-vscode.vscode-json",
+        "bradlc.vscode-tailwindcss",
+        "ms-vscode.vscode-typescript-next",
+        "esbenp.prettier-vscode",
+        "ms-vscode.vscode-eslint",
+        "humao.rest-client",
+        "ms-vscode.vscode-jest"
+      ],
+      "settings": {
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.codeActionsOnSave": {
+          "source.fixAll.eslint": "explicit"
+        },
+        "terminal.integrated.defaultProfile.linux": "bash",
+        "jest.autoRun": "watch"
+      }
+    }
+  },
+  
+  // Port forwarding
+  "forwardPorts": [3000],
+  "portsAttributes": {
+    "3000": {
+      "label": "Banking API",
+      "onAutoForward": "notify"
+    }
+  },
+  
+  // Mount source with correct permissions
+  "mounts": [
+    "source=${localWorkspaceFolder}/logs,target=/app/logs,type=bind"
+  ],
+  
+  // Development user
+  "remoteUser": "node"
+}

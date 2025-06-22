@@ -108,6 +108,59 @@ docker-compose restart banking-api
 docker-compose up --build banking-api -d
 ```
 
+## Development Options
+
+Choose your preferred development environment:
+
+### Option 1: Standard Docker Development (Recommended)
+
+This is the main development approach, supporting all editors and IDEs:
+
+```bash
+# Start development environment
+docker-compose up --build -d
+
+# Run tests
+docker-compose exec banking-api npm test
+
+# View logs
+./scripts/view-logs.sh live
+
+# Enter container for debugging
+docker-compose exec banking-api sh
+```
+
+**Advantages:**
+- ✅ Works with any editor (VS Code, IntelliJ, Vim, etc.)
+- ✅ Simple and straightforward
+- ✅ No additional VS Code dependencies
+- ✅ Fast setup
+
+### Option 2: VS Code Dev Container (Optional)
+
+For VS Code users who want deeper IDE integration:
+
+1. **Prerequisites:**
+   - VS Code with Dev Containers extension
+   - Docker and Docker Compose
+
+2. **Setup:**
+   ```bash
+   # Open project in VS Code
+   code .
+   
+   # Press F1 → "Dev Containers: Reopen in Container"
+   # VS Code will build and connect to the development container
+   ```
+
+**Advantages:**
+- ✅ Deep VS Code integration
+- ✅ IntelliSense and debugging in container
+- ✅ Extensions run inside container
+- ✅ Consistent development environment
+
+**Note:** Both approaches use the same Docker configuration, so you can switch between them anytime.
+
 ## API Usage Examples
 ```bash
 curl -X POST http://localhost:3000/api/accounts \
