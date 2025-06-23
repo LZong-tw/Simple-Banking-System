@@ -12,6 +12,9 @@ RUN npm ci
 COPY src/ ./src/
 COPY tests/ ./tests/
 
+# Create logs directory with proper permissions
+RUN mkdir -p /app/logs
+
 # Create non-root user
 RUN addgroup -g 1001 -S nodejs
 RUN adduser -S banking -u 1001

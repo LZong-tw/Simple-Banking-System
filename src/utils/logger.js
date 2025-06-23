@@ -88,7 +88,7 @@ class Logger {
     }
 
     // Banking specific logging methods
-    logAccountCreation(accountId, accountName, initialBalance) {
+    logAccountCreation(accountId, accountName, initialBalance, meta = {}) {
         this.transaction('Account created', {
             action: 'CREATE_ACCOUNT',
             accountId,
