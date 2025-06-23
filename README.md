@@ -138,13 +138,7 @@ If you must use yarn or pnpm, please be aware of potential compatibility issues 
 
 ### Development with Docker
 
-1. **Initialize project** (first time only):
-   ```bash
-   # Create initial project structure
-   docker-compose --profile init up init
-   ```
-
-2. **Start development environment**:
+1. **Start development environment**:
    ```bash
    # Build and run in background
    docker-compose up --build -d
