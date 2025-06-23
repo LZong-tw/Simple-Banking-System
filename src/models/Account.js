@@ -21,6 +21,23 @@ class Account {
     return this.balance;
   }
 
+  atomicTransfer(amount, isDeposit) {
+    if (amount <= 0) {
+      throw new Error('Transfer amount must be positive');
+    }
+
+    if (isDeposit) {
+      this.balance += amount;
+      return true;
+    } else {
+      if (this.balance < amount) {
+        return false;
+      }
+      this.balance -= amount;
+      return true;
+    }
+  }
+
   withdraw(amount, description = 'Withdrawal') {
     if (amount <= 0) {
       throw new Error('Withdrawal amount must be positive');
@@ -33,6 +50,14 @@ class Account {
     this.balance -= amount;
     this.addTransaction('WITHDRAWAL', amount, null, description);
     return this.balance;
+  }
+
+  getBalanceSafely() {
+    return this.balance;
+  }
+
+  hasInsufficientFunds(amount) {
+    return this.balance < amount;
   }
 
   addTransaction(type, amount, relatedAccountId = null, description = '') {

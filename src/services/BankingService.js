@@ -6,6 +6,7 @@ class BankingService {
   constructor() {
     this.accounts = new Map();
     this.transactionLocks = new Set();
+    this.accountLocks = new Set();
     logger.info('Banking service initialized');
   }
 
@@ -37,18 +38,52 @@ class BankingService {
     return account;
   }
 
-  deposit(accountId, amount) {
-    const account = this.getAccount(accountId);
-    const newBalance = account.deposit(amount);
-    logger.logTransaction('DEPOSIT', accountId, amount, newBalance);
-    return { accountId, newBalance, timestamp: new Date() };
+  async deposit(accountId, amount) {
+    if (this.accountLocks.has(accountId)) {
+      throw new Error('Another operation is in progress for this account');
+    }
+
+    this.accountLocks.add(accountId);
+
+    try {
+      const account = this.getAccount(accountId);
+      const newBalance = account.deposit(amount);
+      logger.logTransaction('DEPOSIT', accountId, amount, newBalance);
+      return { accountId, newBalance, timestamp: new Date() };
+    } catch (error) {
+      logger.error('Deposit failed', {
+        error: error.message,
+        accountId,
+        amount
+      });
+      throw error;
+    } finally {
+      this.accountLocks.delete(accountId);
+    }
   }
 
-  withdraw(accountId, amount) {
-    const account = this.getAccount(accountId);
-    const newBalance = account.withdraw(amount);
-    logger.logTransaction('WITHDRAW', accountId, amount, newBalance);
-    return { accountId, newBalance, timestamp: new Date() };
+  async withdraw(accountId, amount) {
+    if (this.accountLocks.has(accountId)) {
+      throw new Error('Another operation is in progress for this account');
+    }
+
+    this.accountLocks.add(accountId);
+
+    try {
+      const account = this.getAccount(accountId);
+      const newBalance = account.withdraw(amount);
+      logger.logTransaction('WITHDRAW', accountId, amount, newBalance);
+      return { accountId, newBalance, timestamp: new Date() };
+    } catch (error) {
+      logger.error('Withdraw failed', {
+        error: error.message,
+        accountId,
+        amount
+      });
+      throw error;
+    } finally {
+      this.accountLocks.delete(accountId);
+    }
   }
 
   async transfer(fromAccountId, toAccountId, amount) {
@@ -63,24 +98,32 @@ class BankingService {
     // Create a unique transaction key for atomic operations
     const transactionKey = [fromAccountId, toAccountId].sort().join('-');
     
-    if (this.transactionLocks.has(transactionKey)) {
-      throw new Error('Another transfer is in progress between these accounts');
+    if (this.transactionLocks.has(transactionKey) || 
+        this.accountLocks.has(fromAccountId) || 
+        this.accountLocks.has(toAccountId)) {
+      throw new Error('Another operation is in progress for one or both accounts');
     }
 
     this.transactionLocks.add(transactionKey);
+    this.accountLocks.add(fromAccountId);
+    this.accountLocks.add(toAccountId);
 
     try {
       const fromAccount = this.getAccount(fromAccountId);
       const toAccount = this.getAccount(toAccountId);
 
-      // Check if source account has sufficient funds
-      if (fromAccount.balance < amount) {
+      // Perform atomic balance check and transfer
+      const success = fromAccount.atomicTransfer(amount, false); // withdraw
+      if (!success) {
         throw new Error('Insufficient funds');
       }
-
-      // Perform atomic transfer
-      fromAccount.balance -= amount;
-      toAccount.balance += amount;
+      
+      // Add minimal delay to simulate real-world processing time
+      if (process.env.NODE_ENV === 'test') {
+        await new Promise(resolve => setTimeout(resolve, 1));
+      }
+      
+      toAccount.atomicTransfer(amount, true); // deposit
 
       // Add transaction records
       const transferId = uuidv4();
@@ -128,6 +171,8 @@ class BankingService {
       throw error;
     } finally {
       this.transactionLocks.delete(transactionKey);
+      this.accountLocks.delete(fromAccountId);
+      this.accountLocks.delete(toAccountId);
     }
   }
 
@@ -140,6 +185,7 @@ class BankingService {
   reset() {
     this.accounts.clear();
     this.transactionLocks.clear();
+    this.accountLocks.clear();
   }
 }
 

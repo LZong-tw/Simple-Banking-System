@@ -37,7 +37,7 @@ class BankingController {
         return res.status(400).json({ error: 'Amount must be positive' });
       }
 
-      const result = this.bankingService.deposit(accountId, amount);
+      const result = await this.bankingService.deposit(accountId, amount);
       res.json(result);
     } catch (error) {
       const status = error.message === 'Account not found' ? 404 : 400;
@@ -54,7 +54,7 @@ class BankingController {
         return res.status(400).json({ error: 'Amount must be positive' });
       }
 
-      const result = this.bankingService.withdraw(accountId, amount);
+      const result = await this.bankingService.withdraw(accountId, amount);
       res.json(result);
     } catch (error) {
       const status = error.message === 'Account not found' ? 404 : 400;
