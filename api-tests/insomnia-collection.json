@@ -1,0 +1,458 @@
+{
+  "info": {
+    "name": "Simple Banking System API",
+    "description": "Complete API collection for the Simple Banking System - Compatible with Insomnia REST Client",
+    "version": "1.0.0"
+  },
+  "resources": [
+    {
+      "_id": "env_base",
+      "_type": "environment",
+      "name": "Banking API Environment",
+      "data": {
+        "baseUrl": "http://localhost:3000",
+        "accountId1": "",
+        "accountId2": ""
+      }
+    },
+    {
+      "_id": "folder_accounts",
+      "_type": "request_group",
+      "name": "🏦 Account Management",
+      "description": "Account creation and retrieval operations"
+    },
+    {
+      "_id": "req_create_account_valid",
+      "_type": "request",
+      "parentId": "folder_accounts",
+      "name": "Create Account - Valid",
+      "description": "Create a new account with name and initial balance",
+      "url": "{{ _.baseUrl }}/api/accounts",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"Alice Johnson\",\n  \"initialBalance\": 1000\n}"
+      },
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "tests": [
+        {
+          "name": "Status Code",
+          "code": "expect(response.status).to.equal(201);"
+        },
+        {
+          "name": "Response Structure",
+          "code": "expect(response.body).to.have.property('id');\nexpect(response.body).to.have.property('name');\nexpect(response.body).to.have.property('balance');\nexpect(response.body.name).to.equal('Alice Johnson');\nexpect(response.body.balance).to.equal(1000);"
+        }
+      ]
+    },
+    {
+      "_id": "req_create_account_no_balance",
+      "_type": "request",
+      "parentId": "folder_accounts", 
+      "name": "Create Account - No Initial Balance",
+      "description": "Create account without specifying initial balance (should default to 0)",
+      "url": "{{ _.baseUrl }}/api/accounts",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"Bob Smith\"\n}"
+      },
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "tests": [
+        {
+          "name": "Status Code",
+          "code": "expect(response.status).to.equal(201);"
+        },
+        {
+          "name": "Default Balance",
+          "code": "expect(response.body.balance).to.equal(0);"
+        }
+      ]
+    },
+    {
+      "_id": "req_create_account_invalid",
+      "_type": "request",
+      "parentId": "folder_accounts",
+      "name": "Create Account - Invalid (No Name)",
+      "description": "Attempt to create account without required name field",
+      "url": "{{ _.baseUrl }}/api/accounts",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"initialBalance\": 500\n}"
+      },
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "tests": [
+        {
+          "name": "Status Code",
+          "code": "expect(response.status).to.equal(400);"
+        },
+        {
+          "name": "Error Message",
+          "code": "expect(response.body).to.have.property('error');\nexpect(response.body.error).to.contain('Name is required');"
+        }
+      ]
+    },
+    {
+      "_id": "req_get_account_valid",
+      "_type": "request",
+      "parentId": "folder_accounts",
+      "name": "Get Account - Valid",
+      "description": "Retrieve account details by ID",
+      "url": "{{ _.baseUrl }}/api/accounts/{{ _.accountId1 }}",
+      "method": "GET",
+      "headers": [],
+      "tests": [
+        {
+          "name": "Status Code",
+          "code": "expect(response.status).to.equal(200);"
+        },
+        {
+          "name": "Account Data",
+          "code": "expect(response.body).to.have.property('id');\nexpect(response.body).to.have.property('name');\nexpect(response.body).to.have.property('balance');"
+        }
+      ]
+    },
+    {
+      "_id": "req_get_account_not_found",
+      "_type": "request",
+      "parentId": "folder_accounts",
+      "name": "Get Account - Not Found",
+      "description": "Attempt to retrieve non-existent account",
+      "url": "{{ _.baseUrl }}/api/accounts/nonexistent-id",
+      "method": "GET",
+      "headers": [],
+      "tests": [
+        {
+          "name": "Status Code",
+          "code": "expect(response.status).to.equal(404);"
+        },
+        {
+          "name": "Error Message",
+          "code": "expect(response.body).to.have.property('error');"
+        }
+      ]
+    },
+    {
+      "_id": "folder_transactions",
+      "_type": "request_group",
+      "name": "💰 Transactions",
+      "description": "Deposit, withdrawal, and transfer operations"
+    },
+    {
+      "_id": "req_deposit_valid",
+      "_type": "request",
+      "parentId": "folder_transactions",
+      "name": "Deposit - Valid",
+      "description": "Deposit money into an account",
+      "url": "{{ _.baseUrl }}/api/accounts/{{ _.accountId1 }}/deposit",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"amount\": 500\n}"
+      },
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "tests": [
+        {
+          "name": "Status Code",
+          "code": "expect(response.status).to.equal(200);"
+        },
+        {
+          "name": "Balance Updated",
+          "code": "expect(response.body).to.have.property('newBalance');\nexpect(response.body.newBalance).to.equal(1500);"
+        }
+      ]
+    },
+    {
+      "_id": "req_deposit_invalid",
+      "_type": "request",
+      "parentId": "folder_transactions",
+      "name": "Deposit - Invalid Amount",
+      "description": "Attempt to deposit negative amount",
+      "url": "{{ _.baseUrl }}/api/accounts/{{ _.accountId1 }}/deposit",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"amount\": -100\n}"
+      },
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "tests": [
+        {
+          "name": "Status Code",
+          "code": "expect(response.status).to.equal(400);"
+        },
+        {
+          "name": "Error Message",
+          "code": "expect(response.body.error).to.contain('positive');"
+        }
+      ]
+    },
+    {
+      "_id": "req_withdraw_valid",
+      "_type": "request",
+      "parentId": "folder_transactions",
+      "name": "Withdraw - Valid",
+      "description": "Withdraw money from account",
+      "url": "{{ _.baseUrl }}/api/accounts/{{ _.accountId1 }}/withdraw",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"amount\": 300\n}"
+      },
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "tests": [
+        {
+          "name": "Status Code",
+          "code": "expect(response.status).to.equal(200);"
+        },
+        {
+          "name": "Balance Updated",
+          "code": "expect(response.body).to.have.property('newBalance');\nexpected(response.body.newBalance).to.equal(1200);"
+        }
+      ]
+    },
+    {
+      "_id": "req_withdraw_insufficient",
+      "_type": "request",
+      "parentId": "folder_transactions",
+      "name": "Withdraw - Insufficient Funds",
+      "description": "Attempt to withdraw more than account balance",
+      "url": "{{ _.baseUrl }}/api/accounts/{{ _.accountId1 }}/withdraw",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"amount\": 5000\n}"
+      },
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "tests": [
+        {
+          "name": "Status Code",
+          "code": "expect(response.status).to.equal(400);"
+        },
+        {
+          "name": "Error Message",
+          "code": "expect(response.body.error).to.contain('Insufficient');"
+        }
+      ]
+    },
+    {
+      "_id": "req_add_balance_second",
+      "_type": "request",
+      "parentId": "folder_transactions",
+      "name": "Add Balance to Second Account",
+      "description": "Add some balance to second account for transfer testing",
+      "url": "{{ _.baseUrl }}/api/accounts/{{ _.accountId2 }}/deposit",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"amount\": 250\n}"
+      },
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "tests": [
+        {
+          "name": "Status Code",
+          "code": "expect(response.status).to.equal(200);"
+        }
+      ]
+    },
+    {
+      "_id": "req_transfer_valid",
+      "_type": "request",
+      "parentId": "folder_transactions",
+      "name": "Transfer - Valid",
+      "description": "Transfer money between two accounts",
+      "url": "{{ _.baseUrl }}/api/transfer",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"fromAccountId\": \"{{ _.accountId1 }}\",\n  \"toAccountId\": \"{{ _.accountId2 }}\",\n  \"amount\": 200\n}"
+      },
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "tests": [
+        {
+          "name": "Status Code",
+          "code": "expect(response.status).to.equal(200);"
+        },
+        {
+          "name": "Transfer Data",
+          "code": "expect(response.body).to.have.property('amount');\nexpect(response.body).to.have.property('fromBalance');\nexpect(response.body).to.have.property('toBalance');\nexpect(response.body.amount).to.equal(200);"
+        }
+      ]
+    },
+    {
+      "_id": "req_transfer_insufficient",
+      "_type": "request",
+      "parentId": "folder_transactions",
+      "name": "Transfer - Insufficient Funds",
+      "description": "Attempt transfer with insufficient funds",
+      "url": "{{ _.baseUrl }}/api/transfer",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"fromAccountId\": \"{{ _.accountId2 }}\",\n  \"toAccountId\": \"{{ _.accountId1 }}\",\n  \"amount\": 1000\n}"
+      },
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "tests": [
+        {
+          "name": "Status Code",
+          "code": "expect(response.status).to.equal(400);"
+        },
+        {
+          "name": "Error Message",
+          "code": "expect(response.body.error).to.contain('Insufficient');"
+        }
+      ]
+    },
+    {
+      "_id": "req_transfer_missing_accounts",
+      "_type": "request",
+      "parentId": "folder_transactions",
+      "name": "Transfer - Missing Account IDs",
+      "description": "Attempt transfer without providing account IDs",
+      "url": "{{ _.baseUrl }}/api/transfer",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"amount\": 100\n}"
+      },
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "tests": [
+        {
+          "name": "Status Code",
+          "code": "expect(response.status).to.equal(400);"
+        },
+        {
+          "name": "Error Message",
+          "code": "expect(response.body.error).to.contain('account IDs');"
+        }
+      ]
+    },
+    {
+      "_id": "folder_history",
+      "_type": "request_group",
+      "name": "📊 Transaction History",
+      "description": "Transaction history and audit trail"
+    },
+    {
+      "_id": "req_history_valid",
+      "_type": "request",
+      "parentId": "folder_history",
+      "name": "Get Transaction History - Valid",
+      "description": "Retrieve transaction history for an account",
+      "url": "{{ _.baseUrl }}/api/accounts/{{ _.accountId1 }}/transactions",
+      "method": "GET",
+      "headers": [],
+      "tests": [
+        {
+          "name": "Status Code",
+          "code": "expect(response.status).to.equal(200);"
+        },
+        {
+          "name": "History Structure",
+          "code": "expect(response.body).to.be.an('array');\nexpect(response.body.length).to.be.greaterThan(0);\nif (response.body.length > 0) {\n  const transaction = response.body[0];\n  expect(transaction).to.have.property('id');\n  expect(transaction).to.have.property('type');\n  expect(transaction).to.have.property('amount');\n  expect(transaction).to.have.property('timestamp');\n  expect(transaction).to.have.property('balanceAfter');\n}"
+        }
+      ]
+    },
+    {
+      "_id": "req_history_not_found",
+      "_type": "request",
+      "parentId": "folder_history",
+      "name": "Get Transaction History - Account Not Found",
+      "description": "Attempt to get history for non-existent account",
+      "url": "{{ _.baseUrl }}/api/accounts/invalid-account-id/transactions",
+      "method": "GET",
+      "headers": [],
+      "tests": [
+        {
+          "name": "Status Code",
+          "code": "expect(response.status).to.equal(404);"
+        },
+        {
+          "name": "Error Message",
+          "code": "expect(response.body).to.have.property('error');"
+        }
+      ]
+    },
+    {
+      "_id": "folder_health",
+      "_type": "request_group",
+      "name": "🔍 Health Check",
+      "description": "API health monitoring"
+    },
+    {
+      "_id": "req_health_check",
+      "_type": "request",
+      "parentId": "folder_health",
+      "name": "Health Check",
+      "description": "Check API health status",
+      "url": "{{ _.baseUrl }}/health",
+      "method": "GET",
+      "headers": [],
+      "tests": [
+        {
+          "name": "Status Code",
+          "code": "expect(response.status).to.equal(200);"
+        },
+        {
+          "name": "Health Status",
+          "code": "expect(response.body).to.have.property('status');\nexpect(response.body.status).to.equal('OK');\nexpect(response.body).to.have.property('timestamp');"
+        }
+      ]
+    }
+  ]
+}

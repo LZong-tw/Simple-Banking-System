@@ -189,7 +189,53 @@ curl -X POST http://localhost:3000/api/transfer \
   }'
 ```
 
-## Testing
+## API Testing
+
+### Ready-to-Use Test Collections
+
+We provide complete API test collections supporting both Postman and Insomnia:
+
+```
+api-tests/
+├── postman-collection.json      # Postman test collection
+├── postman-environment.json     # Postman environment variables
+├── insomnia-collection.json     # Insomnia test collection
+├── README.md                     # Detailed usage guide
+└── EXAMPLES.md                   # Quick test examples
+```
+
+### Quick Test Setup
+
+#### Postman
+1. Import `api-tests/postman-collection.json`
+2. Import `api-tests/postman-environment.json`
+3. Execute Collection Runner
+
+#### Insomnia
+1. Import `api-tests/insomnia-collection.json`
+2. Set environment variable `baseUrl: http://localhost:3000`
+3. Execute test requests
+
+#### Newman (CLI)
+```bash
+# Install Newman
+npm install -g newman
+
+# Run automated tests
+./scripts/run-api-tests.sh
+```
+
+### Test Coverage
+- ✅ Complete account management operations
+- ✅ All transaction types (deposit, withdrawal, transfer)
+- ✅ Error handling test cases
+- ✅ Transaction history queries
+- ✅ Automated test scripts
+- ✅ Detailed test assertions
+
+For more detailed instructions, refer to `api-tests/README.md`
+
+## Unit & Integration Testing
 
 Run tests inside Docker container:
 

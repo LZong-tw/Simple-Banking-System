@@ -1,0 +1,24 @@
+{
+  "id": "env_dev",
+  "name": "Development Environment",
+  "values": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "description": "Base URL for the Banking API",
+      "enabled": true
+    },
+    {
+      "key": "accountId1",
+      "value": "",
+      "description": "First test account ID (will be populated during tests)",
+      "enabled": true
+    },
+    {
+      "key": "accountId2", 
+      "value": "",
+      "description": "Second test account ID (will be populated during tests)",
+      "enabled": true
+    }
+  ]
+}
