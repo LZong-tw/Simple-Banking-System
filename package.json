@@ -6,20 +6,27 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
-    "test": "jest"
+    "test": "jest",
+    "check-pm": "node scripts/check-package-manager.js",
+    "postinstall": "node scripts/check-package-manager.js"
   },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
+  "packageManager": "npm@10.0.0",
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "cors": "^2.8.5",
-    "express": "^5.1.0",
-    "helmet": "^8.1.0",
-    "uuid": "^11.1.0"
+    "cors": "~2.8.5",
+    "express": "~5.1.0",
+    "helmet": "~8.1.0",
+    "uuid": "~11.1.0"
   },
   "devDependencies": {
-    "jest": "^30.0.2",
-    "nodemon": "^3.1.10",
-    "supertest": "^7.1.1"
+    "jest": "~30.0.2",
+    "nodemon": "~3.1.10",
+    "supertest": "~7.1.1"
   }
 }

@@ -122,6 +122,19 @@ The system follows a **layered architecture** pattern with clear separation of c
 
 ### Prerequisites
 - Docker and Docker Compose installed
+- **Package Manager**: This project is optimized for **npm**. While yarn and pnpm are technically compatible, we strongly recommend using npm to ensure consistent dependency versions.
+
+### ⚠️ Important: Package Manager Compatibility
+
+This project uses **strict version control** to ensure stability across different environments:
+
+- **Recommended**: `npm install` (fully supported with package-lock.json)
+- **Not Recommended**: `yarn install` or `pnpm install` (may cause version conflicts)
+
+If you must use yarn or pnpm, please be aware of potential compatibility issues with:
+- Express v5.x features
+- Jest v30.x configurations  
+- Helmet v8.x security policies
 
 ### Development with Docker
 

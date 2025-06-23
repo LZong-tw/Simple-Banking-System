@@ -2,8 +2,9 @@ FROM node:18-alpine
 
 WORKDIR /app
 
-# Copy package files
+# Copy package files and scripts needed for preinstall
 COPY package*.json ./
+COPY scripts/ ./scripts/
 
 # Install dependencies
 RUN npm ci
