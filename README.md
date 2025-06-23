@@ -15,6 +15,92 @@ A RESTful API banking system built with Node.js and Express.js featuring atomic 
 - ✅ Docker containerization
 - ✅ In-memory data storage
 
+## System Architecture
+
+```mermaid
+graph TB
+    %% Client Layer
+    Client[🌐 Client Applications<br/>Browser, Postman, Mobile]
+    
+    %% Docker Container
+    subgraph Docker["🐳 Docker Container"]
+        %% Server and API Layer combined
+        subgraph ServerAPI["📡 Express.js Server & API Routes"]
+            ExpressCore[🔒 Security & CORS & JSON<br/>❤️ Health Check<br/>⚠️ Error Handler]
+            Routes[🛣️ Banking Routes<br/>POST /api/accounts, GET /api/accounts/:id<br/>POST /api/accounts/:id/deposit, /api/accounts/:id/withdraw<br/>POST /api/transfer, GET /api/accounts/:id/transactions]
+        end
+        
+        %% Business Logic Layer
+        subgraph BusinessLayer["🎮 Application Layer"]
+            Controller[Banking Controller<br/>Request Processing]
+            Service[Banking Service<br/>Business Logic & Atomic Transactions]
+        end
+        
+        %% Data and Model Layer
+        subgraph DataModel["💾 Data & Model Layer"]
+            AccountModel[Account Model<br/>deposit, withdraw, transactions]
+            Storage[In-Memory Storage<br/>Accounts Map & Transaction Locks]
+        end
+        
+        %% Support Systems
+        subgraph Support["🛠️ Support Systems"]
+            Logger[📝 Logger<br/>Audit & Debug Logs]
+            Tests[🧪 Tests<br/>Unit & Integration]
+        end
+    end
+    
+    %% Atomic Transaction Process (side panel)
+    subgraph AtomicFlow["🔒 Atomic Transaction Steps"]
+        Steps["Lock Accounts<br/>Validate Balance<br/>Execute Transfer<br/>Log Transaction<br/>Release Lock"]
+    end
+    
+    %% Main Flow Connections
+    Client --> ExpressCore
+    ExpressCore --> Routes
+    Routes --> Controller
+    Controller --> Service
+    Service --> AccountModel
+    AccountModel --> Storage
+    
+    %% Cross-cutting concerns
+    Service -.->|Uses| AtomicFlow
+    Controller -.->|Logs to| Logger
+    Service -.->|Logs to| Logger
+    Tests -.->|Validates| Service
+    Tests -.->|Validates| AccountModel
+    
+    %% Styling for better visual balance
+    classDef clientStyle fill:#e1f5fe,stroke:#01579b,stroke-width:2px
+    classDef serverStyle fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
+    classDef businessStyle fill:#e8f5e8,stroke:#1b5e20,stroke-width:2px
+    classDef dataStyle fill:#fff3e0,stroke:#e65100,stroke-width:2px
+    classDef supportStyle fill:#f0fdf4,stroke:#16a34a,stroke-width:2px
+    classDef atomicStyle fill:#fef3c7,stroke:#f59e0b,stroke-width:2px
+    
+    class Client clientStyle
+    class ServerAPI,ExpressCore,Routes serverStyle
+    class BusinessLayer,Controller,Service businessStyle
+    class DataModel,AccountModel,Storage dataStyle
+    class Support,Logger,Tests supportStyle
+    class AtomicFlow,Steps atomicStyle
+```
+
+### Architecture Overview
+
+The system follows a **layered architecture** pattern with clear separation of concerns:
+
+- **Client Layer**: External applications (browsers, API clients, mobile apps)
+- **API Layer**: Express.js server with security middleware and routing
+- **Application Layer**: Controllers handle HTTP requests, Services contain business logic
+- **Data Layer**: Account models and in-memory storage with transaction locks
+- **Support Systems**: Logging for audit trails and comprehensive test coverage
+
+**Key Features:**
+- 🔒 **Atomic Transactions**: Thread-safe transfers with locking mechanisms
+- 📝 **Audit Logging**: Complete transaction history and system logs
+- 🧪 **Test Coverage**: Unit and integration tests validate all components
+- 🐳 **Containerized**: Fully containerized with Docker for consistent deployment
+
 ## API Endpoints
 
 ### Accounts
